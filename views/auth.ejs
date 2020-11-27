@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>Cognito simple example for external IDP</title>
+    <meta charset="UTF-8">
+    <script src="/js/aws-amplify.min.js"></script>
+    <script src="/js/amplifyConfig.js"></script>
+</head>
+
+<body onload="onLoad()">
+<div>
+    <div>
+        Cognito User Pools sample with external IDP
+    </div>
+    <div>
+        <input type="text" id="idTokenBox"></input><button id="copyIdToken">Copy</button>
+    </div>
+    <div>
+        <input type="text" id="accessTokenBox"></input><button id="copyAccessToken">Copy</button>
+    </div>
+    <div>
+        <a id="signOutButton" href="javascript:void(0)" title="Sign Out">サインアウト</a>
+    </div>
+    <div>
+        <a href="/" title="Sign Out">トップへ</a>
+    </div>
+    <div>
+        <pre id="sessionInfo"></pre>
+    </div>
+</div>
+<script>
+    function onLoad() {
+        let Amplify = window['aws_amplify'].Amplify;
+        let Auth = window['aws_amplify'].Auth;
+
+        Amplify.configure(amplifyConfig);
+
+        document.getElementById('copyIdToken').addEventListener("click", {textBoxid: 'idTokenBox', handleEvent: copy});
+        document.getElementById('copyAccessToken').addEventListener("click", {textBoxid: 'accessTokenBox', handleEvent: copy});
+        document.getElementById("signOutButton").addEventListener("click", function() {userSingOutButton(Auth);});
+
+        Auth.currentSession().then(session => {
+            document.getElementById('idTokenBox').value = session.idToken.jwtToken;
+            document.getElementById('accessTokenBox').value = session.accessToken.jwtToken;
+            document.getElementById('sessionInfo').innerText = JSON.stringify(session, null, 2);
+        }).catch(e => {
+            console.log(e);
+        });
+    }
+
+    function userSingOutButton(Auth) {
+        Auth.signOut();
+    }
+    function copy(e) {
+        var copyText = document.getElementById(this.textBoxid);
+        copyText.select();
+        document.execCommand("copy");
+    }
+</script>
+</body>
+</html>
